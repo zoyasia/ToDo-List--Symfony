@@ -20,8 +20,8 @@ class Task
     #[ORM\Column(length: 1500, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $deadline = null;
+    #[ORM\Column(length: 255)]
+    private ?string $deadline = null;
 
     #[ORM\Column]
     private ?bool $isCompleted = null;
@@ -58,12 +58,12 @@ class Task
         return $this;
     }
 
-    public function getDeadline(): ?\DateTimeInterface
+    public function getDeadline(): ?string
     {
         return $this->deadline;
     }
 
-    public function setDeadline(\DateTimeInterface $deadline): static
+    public function setDeadline(?string $deadline): static
     {
         $this->deadline = $deadline;
 
