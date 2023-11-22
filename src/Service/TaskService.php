@@ -11,10 +11,12 @@ use Symfony\Component\HttpFoundation\Request;
 class TaskService
 {
     private TaskRepository $taskRepository;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(TaskRepository $taskRepository)
+    public function __construct(TaskRepository $taskRepository, EntityManagerInterface $entityManager)
     {
         $this->taskRepository = $taskRepository;
+        $this->entityManager = $entityManager;
     }
 
     public function showTasks(): JsonResponse
@@ -36,41 +38,55 @@ class TaskService
         return new JsonResponse([
             'message' => 'Voici toutes vos tâches',
             'tasks' => $tasksArray,
-        ]);    
+        ]);
     }
 
-    public function newTask(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    public function newTask(Request $request): JsonResponse
     {
         $task = new Task();
         $text = $request->getContent();
-        $data = json_decode($text,true);
+        $data = json_decode($text, true);
 
         $task
-        ->setTitle($data['title'])
-        ->setDescription($data['description'])
-        ->setStatus($data['status'])
-        ->setDeadline($data['deadline'])
-        ->setIsCompleted($data['isCompleted']);
+            ->setTitle($data['title'])
+            ->setDescription($data['description'])
+            ->setStatus($data['status'])
+            ->setDeadline($data['deadline'])
+            ->setIsCompleted($data['isCompleted']);
 
 
-            // Si tout va bien, alors on peut persister l'entité et valider les modifications en BDD
-            $entityManager->persist($task);
-            $entityManager->flush();
-    
-    return new JsonResponse([
-        'message' => 'Tâche créée avec succès',
-        'task' => [
-            'id' => $task->getId(),
-            'title' => $task->getTitle(),
-            'description' => $task->getDescription(),
-            'status' => $task->getStatus(),
-            'deadline' => $task->getDeadline(),
-            'isCompleted' => $task->isIsCompleted(),
-        ],
-    ]);
-}
+        // Si tout va bien, alors on peut persister l'entité et valider les modifications en BDD
+        $this->entityManager->persist($task);
+        $this->entityManager->flush();
+
+        return new JsonResponse([
+            'message' => 'Tâche créée avec succès',
+            'task' => [
+                'id' => $task->getId(),
+                'title' => $task->getTitle(),
+                'description' => $task->getDescription(),
+                'status' => $task->getStatus(),
+                'deadline' => $task->getDeadline(),
+                'isCompleted' => $task->isIsCompleted(),
+            ],
+        ]);
+    }
+
+    public function deleteTask($taskId): JsonResponse
+    {
+
+        $task = $this->taskRepository->find($taskId);
+
+        if (!$task) {
+            return new JsonResponse(['message' => 'Tâche non trouvée']);
+        }
+
+        $this->entityManager->remove($task);
+        $this->entityManager->flush();
 
 
-
-
+        return new JsonResponse([
+            'message' => 'Tâche supprimée avec succès',
+        ]);
+    }
 }

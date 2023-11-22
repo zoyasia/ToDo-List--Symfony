@@ -25,14 +25,20 @@ class TaskController extends AbstractController
     {
         return $this->taskService->showTasks();
     }
-    
+
 
     #[Route('/new', name: 'app_new', methods: ['POST', 'GET'])]
     public function newTask(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
-        return $this->taskService->newTask($request, $entityManager);
-}
+        return $this->taskService->newTask($request);
+    }
+
+    #[Route('/delete{id}', name: 'app_edit', methods: ['POST', 'GET'])]
+
+    public function deleteTask($id): JsonResponse
+    {
+        return $this->taskService->deleteTask($id);
+    }
 
 
 }
-
