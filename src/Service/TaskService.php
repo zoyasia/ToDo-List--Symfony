@@ -61,14 +61,7 @@ class TaskService
 
         return new JsonResponse([
             'message' => 'Tâche créée avec succès',
-            'task' => [
-                'id' => $task->getId(),
-                'title' => $task->getTitle(),
-                'description' => $task->getDescription(),
-                'status' => $task->getStatus(),
-                'deadline' => $task->getDeadline(),
-                'isCompleted' => $task->isIsCompleted(),
-            ],
+            'task' => $this->taskToArray($task),
         ]);
     }
 
@@ -91,14 +84,7 @@ class TaskService
 
         return new JsonResponse([
             'message' => 'Tâche modifiée avec succès :',
-            'task' => [
-                'id' => $task->getId(),
-                'title' => $task->getTitle(),
-                'description' => $task->getDescription(),
-                'status' => $task->getStatus(),
-                'deadline' => $task->getDeadline(),
-                'isCompleted' => $task->isIsCompleted(),
-            ],
+            'task' => $this->taskToArray($task),
         ]);
     }
 
@@ -119,4 +105,21 @@ class TaskService
             'message' => 'Tâche supprimée avec succès',
         ]);
     }
+
+    private function taskToArray(Task $task): array
+    {
+        return [
+            'id' => $task->getId(),
+            'title' => $task->getTitle(),
+            'description' => $task->getDescription(),
+            'status' => $task->getStatus(),
+            'deadline' => $task->getDeadline(),
+            'isCompleted' => $task->isIsCompleted(),
+        ];
+    }
+
+
+
+
+
 }
