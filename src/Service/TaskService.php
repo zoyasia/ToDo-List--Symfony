@@ -72,6 +72,36 @@ class TaskService
         ]);
     }
 
+    public function updateTask($taskId, Request $request): JsonResponse
+    {
+        $task = $this->taskRepository->find($taskId);
+        $content = $request->getContent();
+        $data = json_decode($content, true);
+
+        $task
+            ->setTitle($data['title'])
+            ->setDescription($data['description'])
+            ->setStatus($data['status'])
+            ->setDeadline($data['deadline'])
+            ->setIsCompleted($data['isCompleted']);
+
+            $this->entityManager->persist($task);
+            $this->entityManager->flush();
+
+
+        return new JsonResponse([
+            'message' => 'Tâche modifiée avec succès :',
+            'task' => [
+                'id' => $task->getId(),
+                'title' => $task->getTitle(),
+                'description' => $task->getDescription(),
+                'status' => $task->getStatus(),
+                'deadline' => $task->getDeadline(),
+                'isCompleted' => $task->isIsCompleted(),
+            ],
+        ]);
+    }
+
     public function deleteTask($taskId): JsonResponse
     {
 
