@@ -35,10 +35,8 @@ class TaskService
             ];
         }
 
-        return new JsonResponse([
-            'message' => 'Voici toutes vos tâches',
-            'tasks' => $tasksArray,
-        ]);
+        return new JsonResponse($tasksArray);
+
     }
 
     public function newTask(Request $request): JsonResponse
