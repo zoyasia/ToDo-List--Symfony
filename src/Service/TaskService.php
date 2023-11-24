@@ -48,9 +48,9 @@ class TaskService
         $task
             ->setTitle($data['title'])
             ->setDescription($data['description'])
-            ->setStatus($data['status'])
+            ->setStatus($data['status'] ?? 'à faire')
             ->setDeadline($data['deadline'])
-            ->setIsCompleted($data['isCompleted']);
+            ->setIsCompleted($data['isCompleted'] ?? false);
 
 
         // Si tout va bien, alors on peut persister l'entité et valider les modifications en BDD
