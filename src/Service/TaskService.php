@@ -48,7 +48,7 @@ class TaskService
         $task
             ->setTitle($data['title'])
             ->setDescription($data['description'])
-            // ->setStatus($data['status'] ?? 'à faire')
+            ->setStatus($data['status'] ?? 'à faire')
             ->setDeadline($data['deadline'])
             ->setIsCompleted($data['isCompleted'] ?? false);
 
@@ -65,16 +65,10 @@ class TaskService
 
     public function updateTask(Task $task, array $data): void
     {
-        // $task = $this->taskRepository->find($taskId);
-        // $content = $request->getContent();
-        // $data = json_decode($content, true);
-
         $task
             ->setTitle($data['title'])
             ->setDescription($data['description'])
-            // ->setStatus($data['status'])
             ->setDeadline($data['deadline']);
-            // ->setIsCompleted($data['isCompleted']);
 
             $this->entityManager->persist($task);
             $this->entityManager->flush();

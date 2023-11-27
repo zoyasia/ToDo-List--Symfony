@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\TaskRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TaskRepository::class)]
