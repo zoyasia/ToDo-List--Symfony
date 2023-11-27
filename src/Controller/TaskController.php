@@ -2,11 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Task;
 use App\Service\TaskService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+
 
 class TaskController extends AbstractController
 {
@@ -30,10 +33,11 @@ class TaskController extends AbstractController
         return $this->taskService->newTask($request);
     }
 
-    #[Route('/update/{id}', name: 'app_update', methods: ['POST', 'GET'])]
-    public function updateTask($id, Request $request): JsonResponse
+    #[Route('/update/{task}', name: 'app_update', methods: ['PATCH'])]
+    public function updateTask(Task $task, Request $request): JsonResponse
     {
-        return $this->taskService->updateTask($id, $request);
+        $this->taskService->updateTask($task, $request->toArray());
+        return new JsonResponse($task, Response::HTTP_CREATED);
     }
 
     #[Route('/delete/{id}', name: 'app_delete', methods: ['DELETE'])]
