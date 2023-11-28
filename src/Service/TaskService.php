@@ -39,7 +39,31 @@ class TaskService
 
     }
 
-    public function newTask(Request $request): JsonResponse
+    // public function newTask(Request $request): JsonResponse
+    // {
+    //     $task = new Task();
+    //     $text = $request->getContent();
+    //     $data = json_decode($text, true);
+
+    //     $task
+    //         ->setTitle($data['title'])
+    //         ->setDescription($data['description'])
+    //         ->setStatus($data['status'] ?? 'à faire')
+    //         ->setDeadline($data['deadline'])
+    //         ->setIsCompleted($data['isCompleted'] ?? false);
+
+
+    //     // Si tout va bien, alors on peut persister l'entité et valider les modifications en BDD
+    //     $this->entityManager->persist($task);
+    //     $this->entityManager->flush();
+
+    //     return new JsonResponse([
+    //         'message' => 'Tâche créée avec succès',
+    //         'task' => $this->taskToArray($task),
+    //     ]);
+    // }
+
+    public function newTask(Request $request): Task
     {
         $task = new Task();
         $text = $request->getContent();
@@ -57,10 +81,7 @@ class TaskService
         $this->entityManager->persist($task);
         $this->entityManager->flush();
 
-        return new JsonResponse([
-            'message' => 'Tâche créée avec succès',
-            'task' => $this->taskToArray($task),
-        ]);
+        return $task;
     }
 
     public function updateTask(Task $task, array $data): void

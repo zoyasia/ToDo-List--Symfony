@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Task;
+use App\Normalizer\TaskNormalizer;
 use App\Service\TaskService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,6 +16,7 @@ class TaskController extends AbstractController
 {
 
     private TaskService $taskService;
+    private TaskNormalizer $normalizer;
 
     public function __construct(TaskService $taskService)
     {
@@ -30,7 +32,9 @@ class TaskController extends AbstractController
     #[Route('/new', name: 'app_new', methods: ['POST', 'GET'])]
     public function newTask(Request $request): JsonResponse
     {
-        return $this->taskService->newTask($request);
+        $this->taskService->newTask($request);
+        $data = $this->normalizer->normalize($request);
+        return $this->json(['task' => $data], Response::HTTP_CREATED);
     }
 
     #[Route('/update/{task}', name: 'app_update', methods: ['PATCH'])]
