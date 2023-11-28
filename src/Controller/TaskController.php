@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\Task;
 use App\Normalizer\TaskNormalizer;
 use App\Service\TaskService;
-use Normalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,33 +25,34 @@ class TaskController extends AbstractController
     }
 
     #[Route('/tasks', name: 'app_tasks')]
-    public function index(TaskNormalizer $taskNormalizer): JsonResponse
+    public function index(): JsonResponse
     {
         $tasks = $this->taskService->showTasks();
-        $normalizedTasks = array_map([$taskNormalizer, 'normalize'], $tasks);
+        $normalizedTasks = array_map([$this->normalizer, 'normalize'], $tasks);
 
         return $this->json($normalizedTasks);
     }
 
-    #[Route('/new', name: 'app_new', methods: ['POST', 'GET'])]
-    public function newTask(Request $request)
+    #[Route('/new', name: 'app_new', methods: ['POST'])]
+    public function newTask(Request $request): JsonResponse
     {
-        $this->taskService->newTask($request);
-        $data = $this->normalizer->normalize($request);
-        return $this->json(['task' => $data], Response::HTTP_CREATED);
+        $task = $this->taskService->newTask($request);
+        $normalizedTask = $this->normalizer->normalize($task);
+
+        return $this->json(['task' => $normalizedTask], Response::HTTP_CREATED);
     }
 
     #[Route('/update/{task}', name: 'app_update', methods: ['PATCH'])]
     public function updateTask(Task $task, Request $request): JsonResponse
     {
         $this->taskService->updateTask($task, $request->toArray());
-        return new JsonResponse($task, Response::HTTP_CREATED);
+        return new JsonResponse($task, Response::HTTP_OK);
     }
 
     #[Route('/delete/{id}', name: 'app_delete', methods: ['DELETE'])]
-
     public function deleteTask($id): JsonResponse
     {
-        return $this->taskService->deleteTask($id);
+        $this->taskService->deleteTask($id);
+        return new JsonResponse(['message' => 'Tâche supprimée avec succès']);
     }
 }

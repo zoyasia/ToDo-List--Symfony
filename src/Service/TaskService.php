@@ -5,7 +5,6 @@ namespace App\Service;
 use App\Entity\Task;
 use App\Repository\TaskRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class TaskService
@@ -19,25 +18,6 @@ class TaskService
         $this->entityManager = $entityManager;
     }
 
-    // public function showTasks(): JsonResponse
-    // {
-    //     $tasks = $this->taskRepository->findAll();
-
-    //     $tasksArray = [];
-    //     foreach ($tasks as $task) {
-    //         $tasksArray[] = [
-    //             'id' => $task->getId(),
-    //             'title' => $task->getTitle(),
-    //             'description' => $task->getDescription(),
-    //             'status' => $task->getStatus(),
-    //             'deadline' => $task->getDeadline(),
-    //             'isCompleted' => $task->isIsCompleted(),
-    //         ];
-    //     }
-
-    //     return new JsonResponse($tasksArray);
-
-    // }
     public function showTasks(): array
     {
         $tasks = $this->taskRepository->findAll();
@@ -48,39 +28,14 @@ class TaskService
         }
 
         return $tasksArray;
-
     }
-
-    // public function newTask(Request $request): JsonResponse
-    // {
-    //     $task = new Task();
-    //     $text = $request->getContent();
-    //     $data = json_decode($text, true);
-
-    //     $task
-    //         ->setTitle($data['title'])
-    //         ->setDescription($data['description'])
-    //         ->setStatus($data['status'] ?? 'à faire')
-    //         ->setDeadline($data['deadline'])
-    //         ->setIsCompleted($data['isCompleted'] ?? false);
-
-
-    //     // Si tout va bien, alors on peut persister l'entité et valider les modifications en BDD
-    //     $this->entityManager->persist($task);
-    //     $this->entityManager->flush();
-
-    //     return new JsonResponse([
-    //         'message' => 'Tâche créée avec succès',
-    //         'task' => $this->taskToArray($task),
-    //     ]);
-    // }
 
     public function newTask(Request $request): Task
     {
-        $task = new Task();
         $text = $request->getContent();
         $data = json_decode($text, true);
 
+        $task = new Task();
         $task
             ->setTitle($data['title'])
             ->setDescription($data['description'])
@@ -88,8 +43,6 @@ class TaskService
             ->setDeadline($data['deadline'])
             ->setIsCompleted($data['isCompleted'] ?? false);
 
-
-        // Si tout va bien, alors on peut persister l'entité et valider les modifications en BDD
         $this->entityManager->persist($task);
         $this->entityManager->flush();
 
@@ -103,40 +56,23 @@ class TaskService
             ->setDescription($data['description'])
             ->setDeadline($data['deadline']);
 
-            $this->entityManager->persist($task);
-            $this->entityManager->flush();
-
+        $this->entityManager->persist($task);
+        $this->entityManager->flush();
     }
 
-    public function deleteTask($taskId): JsonResponse
+    public function deleteTask($taskId): Task
     {
 
         $task = $this->taskRepository->find($taskId);
 
         if (!$task) {
-            return new JsonResponse(['message' => 'Tâche non trouvée']);
+            throw new \Doctrine\ORM\EntityNotFoundException('Tâche non trouvée');
         }
 
         $this->entityManager->remove($task);
         $this->entityManager->flush();
 
-
-        return new JsonResponse([
-            'message' => 'Tâche supprimée avec succès',
-        ]);
+        return $task;
     }
-
-    private function taskToArray(Task $task): array
-    {
-        return [
-            'id' => $task->getId(),
-            'title' => $task->getTitle(),
-            'description' => $task->getDescription(),
-            'status' => $task->getStatus(),
-            'deadline' => $task->getDeadline(),
-            'isCompleted' => $task->isIsCompleted(),
-        ];
-    }
-
 
 }
