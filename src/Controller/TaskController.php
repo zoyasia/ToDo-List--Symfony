@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Task;
 use App\Normalizer\TaskNormalizer;
 use App\Service\TaskService;
+use Normalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,19 +19,23 @@ class TaskController extends AbstractController
     private TaskService $taskService;
     private TaskNormalizer $normalizer;
 
-    public function __construct(TaskService $taskService)
+    public function __construct(TaskService $taskService, TaskNormalizer $taskNormalizer)
     {
         $this->taskService = $taskService;
+        $this->normalizer = $taskNormalizer;
     }
 
     #[Route('/tasks', name: 'app_tasks')]
-    public function index(): JsonResponse
+    public function index(TaskNormalizer $taskNormalizer): JsonResponse
     {
-        return $this->taskService->showTasks();
+        $tasks = $this->taskService->showTasks();
+        $normalizedTasks = array_map([$taskNormalizer, 'normalize'], $tasks);
+
+        return $this->json($normalizedTasks);
     }
 
     #[Route('/new', name: 'app_new', methods: ['POST', 'GET'])]
-    public function newTask(Request $request): JsonResponse
+    public function newTask(Request $request)
     {
         $this->taskService->newTask($request);
         $data = $this->normalizer->normalize($request);
@@ -50,7 +55,4 @@ class TaskController extends AbstractController
     {
         return $this->taskService->deleteTask($id);
     }
-    
-
-
 }

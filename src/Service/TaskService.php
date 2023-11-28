@@ -19,23 +19,35 @@ class TaskService
         $this->entityManager = $entityManager;
     }
 
-    public function showTasks(): JsonResponse
+    // public function showTasks(): JsonResponse
+    // {
+    //     $tasks = $this->taskRepository->findAll();
+
+    //     $tasksArray = [];
+    //     foreach ($tasks as $task) {
+    //         $tasksArray[] = [
+    //             'id' => $task->getId(),
+    //             'title' => $task->getTitle(),
+    //             'description' => $task->getDescription(),
+    //             'status' => $task->getStatus(),
+    //             'deadline' => $task->getDeadline(),
+    //             'isCompleted' => $task->isIsCompleted(),
+    //         ];
+    //     }
+
+    //     return new JsonResponse($tasksArray);
+
+    // }
+    public function showTasks(): array
     {
         $tasks = $this->taskRepository->findAll();
 
         $tasksArray = [];
         foreach ($tasks as $task) {
-            $tasksArray[] = [
-                'id' => $task->getId(),
-                'title' => $task->getTitle(),
-                'description' => $task->getDescription(),
-                'status' => $task->getStatus(),
-                'deadline' => $task->getDeadline(),
-                'isCompleted' => $task->isIsCompleted(),
-            ];
+            $tasksArray[] = $task;
         }
 
-        return new JsonResponse($tasksArray);
+        return $tasksArray;
 
     }
 
