@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Task;
+use App\Factory\TaskFactory\TaskFactory;
 use App\Repository\TaskRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,19 +30,12 @@ class TaskService
 
         return $tasksArray;
     }
-
     public function newTask(Request $request): Task
     {
         $text = $request->getContent();
         $data = json_decode($text, true);
 
-        $task = new Task();
-        $task
-            ->setTitle($data['title'])
-            ->setDescription($data['description'])
-            ->setStatus($data['status'] ?? 'à faire')
-            ->setDeadline($data['deadline'])
-            ->setIsCompleted($data['isCompleted'] ?? false);
+        $task = TaskFactory::createTask($data);
 
         $this->entityManager->persist($task);
         $this->entityManager->flush();
@@ -49,34 +43,23 @@ class TaskService
         return $task;
     }
 
-    // public function updateTask(Task $task, array $data): void
-    // {
-    //     $task
-    //         ->setTitle($data['title'])
-    //         ->setDescription($data['description'])
-    //         ->setDeadline($data['deadline']);
-
-    //     $this->entityManager->persist($task);
-    //     $this->entityManager->flush();
-    // }
-
     public function updateTask(Task $task, array $data): void
-{
-    if (!empty($data['title']) && $data['title'] !== $task->getTitle()) {
-        $task->setTitle($data['title']);
-    }
+    {
+        if (!empty($data['title']) && $data['title'] !== $task->getTitle()) {
+            $task->setTitle($data['title']);
+        }
 
-    if (!empty($data['description']) && $data['description'] !== $task->getDescription()) {
-        $task->setDescription($data['description']);
-    }
+        if (!empty($data['description']) && $data['description'] !== $task->getDescription()) {
+            $task->setDescription($data['description']);
+        }
 
-    if (!empty($data['deadline']) && $data['deadline'] !== $task->getDeadline()) {
-        $task->setDeadline($data['deadline']);
-    }
+        if (!empty($data['deadline']) && $data['deadline'] !== $task->getDeadline()) {
+            $task->setDeadline($data['deadline']);
+        }
 
-    $this->entityManager->persist($task);
-    $this->entityManager->flush();
-}
+        $this->entityManager->persist($task);
+        $this->entityManager->flush();
+    }
 
     public function deleteTask($taskId): Task
     {
@@ -92,5 +75,4 @@ class TaskService
 
         return $task;
     }
-
 }
