@@ -3,7 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Task;
-use App\Factory\TaskFactory\TaskFactory;
+use App\Factory\TaskFactory;
 use App\Repository\TaskRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,10 +13,13 @@ class TaskService
     private TaskRepository $taskRepository;
     private EntityManagerInterface $entityManager;
 
-    public function __construct(TaskRepository $taskRepository, EntityManagerInterface $entityManager)
+    private TaskFactory $taskFactory;
+
+    public function __construct(TaskRepository $taskRepository, EntityManagerInterface $entityManager, TaskFactory $taskFactory)
     {
         $this->taskRepository = $taskRepository;
         $this->entityManager = $entityManager;
+        $this->taskFactory = $taskFactory;
     }
 
     public function showTasks(): array
@@ -30,12 +33,11 @@ class TaskService
 
         return $tasksArray;
     }
-    public function newTask(Request $request): Task
-    {
-        $text = $request->getContent();
-        $data = json_decode($text, true);
 
-        $task = TaskFactory::createTask($data);
+    public function newTask(string $title, string $description, string $deadline, bool $isCompleted, string $status): Task
+    {
+
+        $task = $this->taskFactory->createTask($title, $description, $deadline, $isCompleted, $status);
 
         $this->entityManager->persist($task);
         $this->entityManager->flush();

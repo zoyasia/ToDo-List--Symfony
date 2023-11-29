@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Factory\TaskFactory;
+namespace App\Factory;
 
 use App\Entity\Task;
 
 class TaskFactory
 {
-    public static function createTask(array $data): Task
+    public function createTask(string $title, string $description, string $deadline, bool $isCompleted, string $status): Task
     {
         $task = new Task();
         $task
-            ->setTitle($data['title'])
-            ->setDescription($data['description'])
-            ->setStatus($data['status'] ?? 'à faire')
-            ->setDeadline($data['deadline'])
-            ->setIsCompleted($data['isCompleted'] ?? false);
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setDeadline($deadline)
+            ->setIsCompleted($isCompleted)
+            ->setStatus($status);
 
         return $task;
     }

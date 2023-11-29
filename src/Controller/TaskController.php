@@ -36,7 +36,16 @@ class TaskController extends AbstractController
     #[Route('/new', name: 'app_new', methods: ['POST'])]
     public function newTask(Request $request): JsonResponse
     {
-        $task = $this->taskService->newTask($request);
+        $data = json_decode($request->getContent(), true);
+
+        $task = $this->taskService->newTask(
+            $data['title'],
+            $data['description'],
+            $data['deadline'],
+            $data['isCompleted'] ?? false,
+            $data['status'] ?? 'à faire'
+        );
+
         $normalizedTask = $this->normalizer->normalize($task);
 
         return $this->json(['task' => $normalizedTask], Response::HTTP_CREATED);
