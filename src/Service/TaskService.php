@@ -12,7 +12,6 @@ class TaskService
 {
     private TaskRepository $taskRepository;
     private EntityManagerInterface $entityManager;
-
     private TaskFactory $taskFactory;
 
     public function __construct(TaskRepository $taskRepository, EntityManagerInterface $entityManager, TaskFactory $taskFactory)
@@ -22,7 +21,7 @@ class TaskService
         $this->taskFactory = $taskFactory;
     }
 
-    public function showTasks(): array
+    public function getAll(): array
     {
         $tasks = $this->taskRepository->findAll();
 
@@ -34,7 +33,7 @@ class TaskService
         return $tasksArray;
     }
 
-    public function newTask(string $title, string $description, string $deadline, bool $isCompleted, string $status): Task
+    public function create(string $title, string $description, string $deadline, bool $isCompleted, string $status): Task
     {
 
         $task = $this->taskFactory->createTask($title, $description, $deadline, $isCompleted, $status);
@@ -45,7 +44,7 @@ class TaskService
         return $task;
     }
 
-    public function updateTask(Task $task, array $data): void
+    public function update(Task $task, array $data): void
     {
         if (!empty($data['title']) && $data['title'] !== $task->getTitle()) {
             $task->setTitle($data['title']);
@@ -63,7 +62,7 @@ class TaskService
         $this->entityManager->flush();
     }
 
-    public function deleteTask($taskId): Task
+    public function delete($taskId): Task
     {
 
         $task = $this->taskRepository->find($taskId);

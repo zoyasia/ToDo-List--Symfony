@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Task;
-use App\Normalizer\TaskNormalizer;
 use App\Service\TaskService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,31 +13,26 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class TaskController extends AbstractController
 {
-
     private TaskService $taskService;
-    private TaskNormalizer $normalizer;
 
-    public function __construct(TaskService $taskService, TaskNormalizer $taskNormalizer)
+    public function __construct(TaskService $taskService)
     {
         $this->taskService = $taskService;
-        $this->normalizer = $taskNormalizer;
     }
 
-    #[Route('/tasks', name: 'app_tasks')]
+    #[Route('/tasks', name: 'app_tasks', methods: ['GET'])]
     public function index(): JsonResponse
     {
-        $tasks = $this->taskService->showTasks();
-        $normalizedTasks = array_map([$this->normalizer, 'normalize'], $tasks);
-
-        return $this->json($normalizedTasks);
+        $tasks = $this->taskService->getAll();
+        return $this->json($tasks);
     }
 
-    #[Route('/new', name: 'app_new', methods: ['POST'])]
+    #[Route('/tasks', name: 'app_new', methods: ['POST'])]
     public function newTask(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
-        $task = $this->taskService->newTask(
+        $task = $this->taskService->create(
             $data['title'],
             $data['description'],
             $data['deadline'],
@@ -46,22 +40,20 @@ class TaskController extends AbstractController
             $data['status'] ?? 'à faire'
         );
 
-        $normalizedTask = $this->normalizer->normalize($task);
-
-        return $this->json(['task' => $normalizedTask], Response::HTTP_CREATED);
+        return $this->json(['task' => $task], Response::HTTP_CREATED);
     }
 
-    #[Route('/update/{task}', name: 'app_update', methods: ['PATCH'])]
+    #[Route('/task/{id}', name: 'app_update', methods: ['PATCH'])]
     public function updateTask(Task $task, Request $request): JsonResponse
     {
-        $this->taskService->updateTask($task, $request->toArray());
+        $this->taskService->update($task, $request->toArray());
         return new JsonResponse($task, Response::HTTP_OK);
     }
 
-    #[Route('/delete/{id}', name: 'app_delete', methods: ['DELETE'])]
-    public function deleteTask($id): JsonResponse
+    #[Route('/task/{id}', name: 'app_delete', methods: ['DELETE'])]
+    public function deleteTask(Task $task): JsonResponse
     {
-        $this->taskService->deleteTask($id);
-        return new JsonResponse(['message' => 'Tâche supprimée avec succès']);
+        $this->taskService->delete($task);
+        return new JsonResponse(['message' => 'Tâche supprimée avec succès'], Response::HTTP_NO_CONTENT);
     }
 }
