@@ -49,16 +49,34 @@ class TaskService
         return $task;
     }
 
-    public function updateTask(Task $task, array $data): void
-    {
-        $task
-            ->setTitle($data['title'])
-            ->setDescription($data['description'])
-            ->setDeadline($data['deadline']);
+    // public function updateTask(Task $task, array $data): void
+    // {
+    //     $task
+    //         ->setTitle($data['title'])
+    //         ->setDescription($data['description'])
+    //         ->setDeadline($data['deadline']);
 
-        $this->entityManager->persist($task);
-        $this->entityManager->flush();
+    //     $this->entityManager->persist($task);
+    //     $this->entityManager->flush();
+    // }
+
+    public function updateTask(Task $task, array $data): void
+{
+    if (!empty($data['title']) && $data['title'] !== $task->getTitle()) {
+        $task->setTitle($data['title']);
     }
+
+    if (!empty($data['description']) && $data['description'] !== $task->getDescription()) {
+        $task->setDescription($data['description']);
+    }
+
+    if (!empty($data['deadline']) && $data['deadline'] !== $task->getDeadline()) {
+        $task->setDeadline($data['deadline']);
+    }
+
+    $this->entityManager->persist($task);
+    $this->entityManager->flush();
+}
 
     public function deleteTask($taskId): Task
     {
